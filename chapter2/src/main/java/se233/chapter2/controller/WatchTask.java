@@ -7,13 +7,13 @@ import se233.chapter2.model.Currency;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-class WatchTask implements Callable<Void> {
+public class WatchTask implements Callable<Void> {
     @Override
-    public Void call() {
-        List<Currency> allCurrency = Launcher.getCurrencyList();
+    public Void call() throws Exception {
+        List<Currency> allCurrency = Launcher.getCurrencies();
         String found = "";
-        for (int i = 0; i<allCurrency.size(); i++) {
-            if (allCurrency.get(i).getWatchRate()!= 0 && allCurrency.get(i).getWatchRate() > allCurrency.get(i).getCurrent().getRate()) {
+        for (int i = 0; i < allCurrency.size(); i++) {
+            if (allCurrency.get(i).getWatchRate() != 0 && allCurrency.get(i).getWatchRate() > allCurrency.get(i).getCurrent().getRate()) {
                 if (found.equals("")) {
                     found = allCurrency.get(i).getShortCode();
                 } else {
@@ -21,14 +21,14 @@ class WatchTask implements Callable<Void> {
                 }
             }
         }
-        if (!found.equals("")) {
+        if (found.equals("")) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle(null);
             alert.setHeaderText(null);
-            if (found.length()>3) {
-                alert.setContentText(String.format("%s have become lower than the watch rate!",found));
-            } else  {
-                alert.setContentText(String.format("%s have become lower than the watch rates!",found));
+            if (found.length() > 3) {
+                alert.setContentText(String.format("%s have become lower than the watch rate!", found));
+            } else {
+                alert.setContentText(String.format("%s have become lower than the watch rates!", found));
             }
             alert.showAndWait();
         }

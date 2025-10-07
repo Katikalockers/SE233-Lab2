@@ -1,8 +1,11 @@
 package se233.chapter2.controller;
 
+import javafx.scene.control.Alert;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
 import se233.chapter2.model.CurrencyEntity;
+import se233.chapter2.view.TopPane;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -19,10 +22,16 @@ public class FetchData {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
             "yyyy-MM-dd");
 
-    public static List<CurrencyEntity> fetchRange(String symbol, int N) {
+    public static List<CurrencyEntity> fetchRange(String symbol, int N, String baseCode) {
         String dateEnd = LocalDate.now().format(formatter);
         String dateStart = LocalDate.now().minusDays(N).format(formatter);
-        String urlStr = String.format("https://cmu.to/SE233currencyapi?base=THB&symbol=%s&start_date=%s&end_date=%s", symbol, dateStart, dateEnd);
+        if (baseCode == null) {
+            baseCode = "THB";
+        }
+        if (baseCode.equals(symbol)) {
+            throw new IllegalArgumentException("Base currency and symbol cannot be the same.");
+        }
+        String urlStr = String.format("https://cmu.to/SE233currencyapi?base=%s&symbol=%s&start_date=%s&end_date=%s", baseCode, symbol, dateStart, dateEnd);
         List<CurrencyEntity> histList = new ArrayList<>();
         try {
             String retrievedJson = IOUtils.toString(new URL(urlStr), Charset.defaultCharset());
@@ -43,8 +52,14 @@ public class FetchData {
             System.err.println("Encounter a Malformed URL Exception.");
         } catch (IOException e) {
             System.err.println("Encounter an IO Exception.");
+        } catch (IllegalArgumentException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
+            alert.show();
+        } catch (JSONException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Please enter a valid currency code (e.g. USD, JPY, THB).");
+            alert.show();
+            System.err.println(e.getMessage());
         }
-
-        return  histList;
+        return histList;
     }
 }

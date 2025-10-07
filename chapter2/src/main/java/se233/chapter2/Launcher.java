@@ -17,19 +17,23 @@ import java.util.concurrent.ExecutionException;
 
 public class Launcher extends Application {
     private static Stage primaryStage;
-    private static Scene mainScene;
     private static FlowPane mainPane;
     private static TopPane topPane;
+    private static CurrencyPane currencyPane;
     private static CurrencyParentPane currencyParentPane;
-    private static List<Currency> currencyList;
+    private static Currency currency;
+    private static List<Currency> currencies;
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     @Override
     public void start(Stage stage) throws ExecutionException, InterruptedException {
         primaryStage = stage;
         primaryStage.setTitle("Currency Watcher");
         primaryStage.setResizable(false);
-        //currency = Initialize.initializeApp();
-        currencyList = Initialize.initializeApp();
+        currencies = Initialize.initializeApp();
         initMainPane();
         Scene mainScene = new Scene(mainPane);
         primaryStage.setScene(mainScene);
@@ -39,24 +43,27 @@ public class Launcher extends Application {
         th.setDaemon(true);
         th.start();
     }
-    private void initMainPane() throws ExecutionException, InterruptedException {
+
+    public void initMainPane() throws ExecutionException, InterruptedException {
         mainPane = new FlowPane();
         topPane = new TopPane();
-        currencyParentPane = new CurrencyParentPane(currencyList);
+        currencyParentPane = new CurrencyParentPane(currencies);
         mainPane.getChildren().add(topPane);
         mainPane.getChildren().add(currencyParentPane);
     }
+
     public static void refreshPane() throws InterruptedException, ExecutionException {
         topPane.refreshPane();
-        currencyParentPane.refreshPane(currencyList);
+        currencyParentPane.refreshPane(currencies);
         primaryStage.sizeToScene();
     }
 
-    public static List<Currency> getCurrencyList() {
-        return Launcher.currencyList;
+    public static List<Currency> getCurrencies() {
+        return Launcher.currencies;
     }
 
-    public static void setCurrencyList(List<Currency> currencyList) {
-        Launcher.currencyList = currencyList;
+    public static void setCurrencies(List<Currency> currencies) {
+        Launcher.currencies = currencies;
     }
 }
+
